@@ -1,0 +1,55 @@
+extends ../layout
+block content
+	.container
+		.row
+			.col-md-8
+				embed(src="#{movie.flash}",allowFullScreen="ture",quality="high",width="720",height="600",align="middle",type="application/x-shockwave-flash")
+				br
+				br
+			.col-md-4
+				dl.dl-horizontal
+					dt 电影名字
+					dd=movie.title
+					dt 导演
+					dd=movie.director
+					dt 国家
+					dd=movie.country
+					dt 语言
+					dd=movie.language
+					dt 上映年份
+					dd=movie.year
+					dt 简介
+					dd=movie.summary
+		.row
+			.col-md-8
+				div.panel.panel-default(width="720")
+					.panel-heading
+						h3 评论区
+					.panel-body(id='comment')
+						each item in comments
+							.media
+							a.pull-left.comment(href='#comments',data-cid='#{item._id}',data-tid='#{item.from._id}',data-tname='#{item.from.name}')
+									img.media-object(src='/image/tx.png',width='45',height='45')
+								div.media-body
+									h4.media-heading &nbsp; #{item.from.name}&nbsp;:
+									p  &nbsp;&nbsp;&nbsp;#{item.content}
+									each reply in item.reply
+										.media
+										a.pull-left.comment(href='#comments',data-cid='#{item._id}',data-tid='#{reply.from._id}',data-tname='#{reply.from.name}')
+												img.media-object(src='/image/tx.png',width='45',height='45')
+											div.media-body
+												h4.media-heading &nbsp; #{reply.from.name}&nbsp;回复 #{reply.to.name}&nbsp;: 
+												p  &nbsp;&nbsp;&nbsp;#{reply.content}
+							hr
+						#comments
+							form(method='POST',action='/movie/comment')
+								.form-group#commentForm
+									input(type='hidden',name='comment[movie]',value='#{movie._id}')
+									if user
+										input(type='hidden',name='comment[from]',value='#{user._id}')
+									textarea.form-control(id='textarea',name='comment[content]',row='3')
+								if user
+									button.btn.btn-primary(type='submit',id='submit',data-id="#{movie._id}") 提交
+								else
+									a.navbar-link(hred="javascript:",data-toggle="modal",data-target="#signinModal") 登陆后才能评论
+	script(src='/js/detail.js')
